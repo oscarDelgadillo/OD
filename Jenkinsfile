@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+	options {
+    // Keep the 10 most recent builds
+    buildDiscarder(logRotator(numToKeepStr:'10')) 
+	}
+
     stages {
         stage('Build') {
             steps {
@@ -12,6 +17,16 @@ pipeline {
             steps {
                 echo 'Testing..'
 				sh './gradlew clean check'
+				
+				// publish html
+				publishHTML target: [
+					allowMissing: false,
+					alwaysLinkToLastBuild: false,
+					keepAll: true,
+					reportDir: 'coverage',
+					reportFiles: 'index.html',
+					reportName: 'RCov Report'
+				  ]
             }
         }
 		stage('Package') {
