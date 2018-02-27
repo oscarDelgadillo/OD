@@ -33,6 +33,13 @@ pipeline {
             steps {
                 echo 'Packaging..'
 				sh './gradlew clean war'
+				
+				post {
+					success {
+					  // Archive the built artifacts
+					  archive includes: 'build/libs/*.war'
+					}
+				  }
             }
         }		
         stage('CodeQuality') {
