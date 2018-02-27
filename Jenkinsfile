@@ -33,6 +33,16 @@ pipeline {
             steps {
                 echo 'Packaging..'
 				sh './gradlew clean war'
+				
+				// publish html
+				publishHTML target: [
+					allowMissing: false,
+					alwaysLinkToLastBuild: false,
+					keepAll: true,
+					reportDir: 'build\libs',
+					reportFiles: 'quickstart.war',
+					reportName: 'Package Report'
+				  ]
             }
         }		
         stage('CodeQuality') {
