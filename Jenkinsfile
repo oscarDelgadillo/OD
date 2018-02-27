@@ -18,15 +18,19 @@ pipeline {
                 echo 'Testing..'
 				sh './gradlew clean check'
 				
-				// publish html
-				publishHTML target: [
-					allowMissing: false,
-					alwaysLinkToLastBuild: false,
-					keepAll: true,
-					reportDir: 'build/reports/tests/test',
-					reportFiles: 'index.html',
-					reportName: 'Unit Test Report'
-				  ]
+				post {
+					success {
+					  // publish html
+					  publishHTML target: [
+							allowMissing: false,
+							alwaysLinkToLastBuild: false,
+							keepAll: true,
+							reportDir: 'build/reports/tests/test',
+							reportFiles: 'index.html',
+							reportName: 'Unit Test Report'
+						]
+					}
+				}
             }
         }
 		stage('Package') {
@@ -39,7 +43,7 @@ pipeline {
 					  // Archive the built artifacts
 					  archive includes: 'build/libs/*.war'
 					}
-				  }
+				}
             }
         }		
         stage('CodeQuality') {
