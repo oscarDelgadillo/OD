@@ -1,2 +1,7 @@
+/.gradle/
+/.idea/
+*.bat
+build/
+*.iml
 /.vagrant/
 .env
