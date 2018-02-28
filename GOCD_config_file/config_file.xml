@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="104">
+  <server artifactsdir="artifacts" agentAutoRegisterKey="c0f7c656-1412-4e31-8b99-f290447283bd" webhookSecret="f6fbc666-59b6-4a7a-b178-3882fd98fbec" commandRepositoryLocation="default" serverId="46e766b5-754a-4cfc-8409-bfac659677c9" tokenGenerationKey="1180a01e-db1b-40df-9b4d-17573c74ea87" />
+  <pipelines group="Web">
+    <pipeline name="web-app-od">
+      <materials>
+        <git url="git@github.com:oscarDelgadillo/OD.git" />
+      </materials>
+      <stage name="Build" cleanWorkingDir="true">
+        <jobs>
+          <job name="build">
+            <tasks>
+              <exec command="./gradlew">
+                <arg>clean</arg>
+                <arg>build</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="Test" cleanWorkingDir="true">
+        <jobs>
+          <job name="UnitTest">
+            <tasks>
+              <exec command="./gradlew">
+                <arg>clean</arg>
+                <arg>check</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <tabs>
+              <tab name="UNIT_TEST" path="report/index.html" />
+            </tabs>
+            <artifacts>
+              <artifact src="build/reports/tests/test/*" dest="report" />
+              <test src="build/test-results/test/*.xml" dest="tests" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="Package">
+        <jobs>
+          <job name="WAR">
+            <tasks>
+              <exec command="./gradlew">
+                <arg>clean</arg>
+                <arg>war</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact src="build/libs/*.war" dest="webapp" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="CodeQuality" cleanWorkingDir="true">
+        <jobs>
+          <job name="sonar">
+            <tasks>
+              <exec command="./gradlew">
+                <arg>sonarqube</arg>
+                <arg>-Dsonar.host.url=http://sonarqube:9000</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="test">
+      <materials>
+        <git url="git@github.com:oscarDelgadillo/OD.git" />
+      </materials>
+      <stage name="Build" cleanWorkingDir="true">
+        <jobs>
+          <job name="build">
+            <tasks>
+              <exec command="./gradlew">
+                <arg>clean</arg>
+                <arg>build</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <agents>
+    <agent hostname="7b7f2c67c493" ipaddress="172.18.0.5" uuid="339ead25-118c-48f8-9616-8bcd3738c427" />
+  </agents>
+</cruise>
